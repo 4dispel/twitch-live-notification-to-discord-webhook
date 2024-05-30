@@ -52,10 +52,10 @@ fn handle_verification_callback(app: &AppState, headers: HeaderMap, body: String
 async fn handle_notification_callback(app: &AppState, headers: HeaderMap, body: String) -> axum::response::Response {
     println!("headers: {:#?}\n body: {}", headers, body);
     let user_name = match serde_json::from_str::<twitch_messages::NotificationMessage>(body.as_str()) {
-        Ok(x) => x.event.broadcaster_user_name,
+        Ok(x) => x.event.broadcaster_user_login,
         Err(_) => return StatusCode::BAD_REQUEST.into_response(),
     };
-    if let Err(err) = send_discord_to_webhook(format!("{} went live", user_name), &app.discord_webhook_url.as_str(), &app.request_client).await {
+    if let Err(err) = send_discord_to_webhook(format!("{} went live\nhttps://twitch.tv/{}", user_name, user_name), &app.discord_webhook_url.as_str(), &app.request_client).await {
         println!("coudln't send message to discord err: {err}");
         return StatusCode::INTERNAL_SERVER_ERROR.into_response();
     }

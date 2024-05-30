@@ -28,7 +28,7 @@ pub struct NotificationMessage {
 
 #[derive(Debug, Deserialize)]
 pub struct Event {
-    pub broadcaster_user_name: String,
+    pub broadcaster_user_login: String,
 }
 
 #[derive(Debug, Deserialize)]
