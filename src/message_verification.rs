@@ -6,7 +6,6 @@ use hmac::{digest::MacError, Hmac, Mac};
 use sha2::Sha256;
 use std::fmt::Display;
 type HmacSha256 = Hmac<Sha256>;
-use hex_literal::hex;
 pub fn verify_message(
     headers: &HeaderMap,
     body: &String,
