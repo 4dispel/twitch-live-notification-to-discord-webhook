@@ -21,6 +21,7 @@ pub struct ChallengeRequest {
     pub challenge: String,
 }
 
+//https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamonline
 #[derive(Debug, Deserialize)]
 pub struct NotificationMessage {
     pub event: Event,
@@ -31,6 +32,7 @@ pub struct Event {
     pub broadcaster_user_login: String,
 }
 
+//https://dev.twitch.tv/docs/eventsub/handling-webhook-events/#revoking-your-subscription
 #[derive(Debug, Deserialize)]
 pub struct RevocationMessage {
     pub condition: Condition,
