@@ -1,22 +1,92 @@
 body {
   font-family: "Karla", sans-serif;
   font-size: 12pt;
+  background-color: #303030;
+  color: #bcbcbc ;
+  padding-bottom: 50px;
+}
+
+button {
+  height: 25px;
+  background-color: #8a199e;
+  color: #c2c2c2;
+  border: 0px;
+  border-radius: 5px;
+}
+
+.user-card-container {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .user-card {
+  /* flex: 1 1 400px; */
   display: flex;
-  border: 1px solid #ccc;
+  border: 1px solid #505050;
   border-radius: 5px;
   padding: 5px;
-  margin-bottom: 10px; 
+  margin: 10px; 
   align-items: center;
+  width: 400px;
 }
 
 .user-card-element {
   margin: 0 10px
 }
 
+.user-name-and-status {
+  width: 180px;
+}
+
 .profile-picture {
-  height: 75px;
+  height: 50px;
   width: auto;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-enabled {
+  color: greenyellow;
+}
+
+.status-webhook_callback_verification_pending {
+  color: yellow;
+}
+
+.status-webhook_callback_verification_failed {
+  color: red;
+}
+
+.status-notification_failures_exceeded {
+  color: red;
+}
+
+.status-version_removed {
+  color: red;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 10px 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+}
+
+.add-user {
+  justify-self: end;
+  padding-right: 20px;
+  margin: 0 10px; 
+}
+
+.reverify {
+  justify-self: start;
+  padding-left: 20px;
+  margin: 0 10px; 
 }

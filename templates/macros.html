@@ -1,8 +1,7 @@
 {% macro user_card(user) %}
 <div class="user-card">
     <div class="user-card-element"><img src="{{user.pfp_link}}" class="profile-picture"></div>
-    <div class="user-card-element">{{user.user_login}}</div>
-    <div class="user-card-element">status: {{user.status}}</div>
+    <div class="user-card-element user-name-and-status"><div>{{user.user_login}}</div> <div class="status-{{user.status}}"> {{user.status}}</div></div>
     <div class="user-card-element">
         <form action="/remove" enctype="multipart/form-data" method="post">
             <input type="hidden" name="eventsub_id" value="{{user.eventsub_id}}">
