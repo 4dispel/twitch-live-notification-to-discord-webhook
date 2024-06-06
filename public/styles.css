@@ -1,0 +1,22 @@
+body {
+  font-family: "Karla", sans-serif;
+  font-size: 12pt;
+}
+
+.user-card {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  margin-bottom: 10px; 
+  align-items: center;
+}
+
+.user-card-element {
+  margin: 0 10px
+}
+
+.profile-picture {
+  height: 75px;
+  width: auto;
+}

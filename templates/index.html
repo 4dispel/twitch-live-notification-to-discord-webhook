@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% import "macros.html" as macros %}{% block content %}
+{% for user in users %}
+{{ macros::user_card(user=user) }}
+{% endfor %}
+<form action="/add" enctype="multipart/form-data" method="post">
+    <label for="login">user login</label>
+    <input type="text" name="login" id="login" required />
+    <button type="submit">add subscription</button>
+</form>
+<form action="/reverify" enctype="multipart/form-data" method="post">
+    <button type="submit">reverify app access token</button>
+</form>
+{% endblock content %}

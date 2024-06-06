@@ -1,0 +1,19 @@
+{% macro user_card(user) %}
+<div class="user-card">
+    <div class="user-card-element"><img src="{{user.pfp_link}}" class="profile-picture"></div>
+    <div class="user-card-element">{{user.user_login}}</div>
+    <div class="user-card-element">status: {{user.status}}</div>
+    <div class="user-card-element">
+        <form action="/remove" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="eventsub_id" value="{{user.eventsub_id}}">
+            <button type="submit">remove</button>
+        </form>
+    </div>
+    <div class="user-card-element">
+        <form action="/add" enctype="multipart/form-data" method="post">
+            <input type="hidden" name="login" value="{{user.user_login}}">
+            <button type="submit">retry</button>
+        </form>
+    </div>
+</div>
+{% endmacro user_card %}
