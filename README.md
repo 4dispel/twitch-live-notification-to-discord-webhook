@@ -11,24 +11,23 @@ TWITCH_CLIENT_ID
 TWITCH_CLIENT_SECRET
 TWITCH_EVENT_SECRET
 DISCORD_WEBHOOK_URL
+PASSWORD
+SERVER_URL
 ```
 - TWITCH_CLIENT_ID: client id for your twitch application
 - TWITCH_CLIENT_SECRET: client secret of your application
 - TWITCH_EVENT_SECRET: secret you use when subscribing to EventSub notifications
 - DISCORD_WEBHOOK_URL: url of the discord webhook you want to send notifications to
+- PASSWORD: the password you use to sign into the web ui
+- SERVER_URL: the url for your shuttle project
 
-note: not all off these are currently neccesary for the application and might be removed later
+## usage
+go to your shuttle website and log in using your PASSWORD
 
-### the stuff you have to do yourself right now
+use the prompt add the bottom to add subscriptions
 
-this server currently only relays the messages to the discord webhook and has no features to manage subscriptions
-you will have to subscribe to events yourself using the twitch api
+if your subscriptions aren't shown click reverify access token
 
-https://dev.twitch.tv/docs/eventsub/eventsub-subscription-types/#streamonline
+remove subscriptions with the remove button
 
-the callback is the url of the shuttle project
-secret is the same secret as in your TWITCH_EVENT_SECRET
-broadcaster_user_id is the user id of the broadcaster for which you want to get notifications
-
-you will also need your application's client id and app access token in the headers to subscribe.
-
+retry for subscriptions that have been revoked for some reason, but you want back
