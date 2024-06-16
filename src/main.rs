@@ -1,7 +1,6 @@
 use axum::{
     debug_handler,
-    extract::{multipart, Extension, FromRef, Multipart, State},
-    handler::Handler,
+    extract::{Extension, FromRef, Multipart, State},
     http::{
         header::{self, HeaderMap},
         Response, StatusCode,
@@ -11,13 +10,11 @@ use axum::{
     BoxError, Router,
 };
 use reqwest::Client;
-use serde_json::json;
 mod message_verification;
 mod sub_management;
 mod twitch_messages;
 use axum_extra::{
-    extract::cookie::{self, Cookie, Key, PrivateCookieJar, SameSite},
-    TypedHeader,
+    extract::cookie::{Cookie, Key, PrivateCookieJar, SameSite},
 };
 use shuttle_runtime::SecretStore;
 use std::collections::HashMap;
@@ -72,7 +69,7 @@ async fn handle_callback(
     };
     match message_type {
         twitch_messages::TwitchEventsubMessage::WebhookCallbackVerification => {
-            handle_verification_callback(&app, headers, body)
+            handle_verification_callback(body)
         }
         twitch_messages::TwitchEventsubMessage::Notification => {
             handle_notification_callback(&app, headers, body).await
@@ -80,13 +77,10 @@ async fn handle_callback(
         twitch_messages::TwitchEventsubMessage::Revocation => {
             handle_revocation_callback(&app, headers, body).await
         }
-        _ => StatusCode::OK.into_response(),
     }
 }
 
 fn handle_verification_callback(
-    app: &AppState,
-    headers: HeaderMap,
     body: String,
 ) -> axum::response::Response {
     let challenge_request =
@@ -163,7 +157,10 @@ async fn send_discord_to_webhook(
 ) -> Result<(), BoxError> {
     let mut map = HashMap::new();
     map.insert(String::from("content"), message);
-    client.post(url).json(&map).send().await?;
+    client
+        .post(url)
+        .json(&map)
+        .send().await?;
     Ok(())
 }
 
@@ -292,9 +289,9 @@ async fn post_add(
 
 
 async fn from_multipart(mut multipart: Multipart, key: &str) -> Option<String> {
-    while let Some(field) = multipart.next_field().await.unwrap() {
-        if key == field.name().unwrap().to_string() {
-            return Some(field.text().await.unwrap());
+    while let Some(field) = multipart.next_field().await.ok()? {
+        if key == field.name()?.to_string() {
+            return Some(field.text().await.ok()?);
         }
     }
     None

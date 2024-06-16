@@ -1,7 +1,4 @@
-use axum::{
-    body::Body,
-    http::{header::HeaderMap, HeaderValue},
-};
+use axum::http::{header::HeaderMap, HeaderValue};
 use hmac::{digest::MacError, Hmac, Mac};
 use sha2::Sha256;
 use std::fmt::Display;
@@ -12,41 +9,31 @@ pub fn verify_message(
     secret: &String,
 ) -> Result<(), HmacVerificationError> {
     let message = get_hmac_message(headers, body)?;
-    let signature = match headers.get("twitch-eventsub-message-signature") {
-        Some(x) => signature_to_hex(&x)?,
-        None => {
-            return Err(HmacVerificationError::MissingHeader(String::from(
-                "twitch-eventsub-message-signature",
-            )))
-        }
-    };
+    let signature = signature_to_hex(headers.get("twitch-eventsub-message-signature").ok_or(
+        HmacVerificationError::MissingHeader(String::from("twitch-eventsub-message-signature")),
+    )?)?;
 
-    let mut mac =
-        HmacSha256::new_from_slice(secret[..].as_bytes()).expect("HMAC can take key of any size");
+    let mut mac = HmacSha256::new_from_slice(secret[..].as_bytes()).unwrap();
     mac.update(message[..].as_bytes());
-    match mac.verify_slice(&signature) {
-        Ok(()) => Ok(()),
-        Err(err) => Err(HmacVerificationError::MacError(err)),
-    }
+    mac.verify_slice(&signature)
+        .map_err(|err| HmacVerificationError::MacError(err))
 }
 
 fn get_hmac_message(headers: &HeaderMap, body: &String) -> Result<String, HmacVerificationError> {
-    let message_id = match headers.get("twitch-eventsub-message-id") {
-        Some(x) => x.to_str().unwrap(),
-        None => {
-            return Err(HmacVerificationError::MissingHeader(String::from(
-                "twitch-eventsub-message-id",
-            )))
-        }
-    };
-    let message_timestamp = match headers.get("twitch-eventsub-message-timestamp") {
-        Some(x) => x.to_str().unwrap(),
-        None => {
-            return Err(HmacVerificationError::MissingHeader(String::from(
-                "twitch-eventsub-message-timestamp",
-            )))
-        }
-    };
+    let message_id = headers
+        .get("twitch-eventsub-message-id")
+        .ok_or(HmacVerificationError::MissingHeader(String::from(
+            "twitch-eventsub-message-id",
+        )))?
+        .to_str()
+        .unwrap();
+    let message_timestamp = headers
+        .get("twitch-eventsub-message-timestamp")
+        .ok_or(HmacVerificationError::MissingHeader(String::from(
+            "twitch-eventsub-message-timestamp",
+        )))?
+        .to_str()
+        .unwrap();
     Ok(format!(
         "{}{}{}",
         message_id,
@@ -76,11 +63,7 @@ fn signature_to_hex(signature: &HeaderValue) -> Result<Vec<u8>, HmacVerification
                 .map_err(|_| Err::<u8, _>(HmacVerificationError::InvalidSignature))
         })
         .collect();
-
-    match bytes {
-        Ok(x) => Ok(x),
-        Err(_) => Err(HmacVerificationError::InvalidSignature),
-    }
+    bytes.map_err(|_| HmacVerificationError::InvalidSignature)
 }
 
 #[derive(Debug)]

@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 // https://dev.twitch.tv/docs/authentication/getting-tokens-oauth/#client-credentials-grant-flow
 // just the access_token

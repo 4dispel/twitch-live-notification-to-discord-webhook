@@ -1,5 +1,4 @@
 use reqwest::Client;
-use std::collections::HashMap;
 use serde::{Serialize, Deserialize, };
 #[derive(Debug, Serialize)]
 pub struct UserCard {
@@ -134,16 +133,13 @@ async fn card_from_sub(
     twitch_client_id: &String,
     twitch_access_token: &String,
 ) -> Option<UserCard> {
-    if let Some(user) = get_user(UserIdentifier::ID(sub.condition.broadcaster_user_id.clone()), client, twitch_client_id, twitch_access_token).await {
-        Some(UserCard{
-            pfp_link: user.profile_image_url,
-            user_login: user.login,
-            eventsub_id: sub.id,
-            status: sub.status,
-        })
-    } else {
-        None
-    }
+    let user = get_user(UserIdentifier::ID(sub.condition.broadcaster_user_id.clone()), client, twitch_client_id, twitch_access_token).await?;
+    Some(UserCard{
+        pfp_link: user.profile_image_url,
+        user_login: user.login,
+        eventsub_id: sub.id,
+        status: sub.status,
+    })
 }
 
 async fn get_subs(
@@ -175,16 +171,12 @@ async fn get_user(
         UserIdentifier::ID(id) => format!("id={}", id),
         UserIdentifier::LOGIN(login) => format!("login={}", login),
     });
-    let response = client.get(url)
+    Some(client
+        .get(url)
         .header("Client-Id", twitch_client_id)
         .header("Authorization", format!("Bearer {}", twitch_access_token))
-        .send().await;
-    if response.is_err() {
-        return None;
-    }
-    let users = response.unwrap().json::<Users>().await;
-    if users.is_err() {
-        return None;
-    }
-    Some(users.unwrap().data.get(0)?.clone())
+        .send().await.ok()?
+        .json::<Users>().await.ok()?
+        .data.get(0)?
+        .clone())
 }
