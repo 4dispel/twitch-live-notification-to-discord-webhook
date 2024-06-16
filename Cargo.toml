@@ -15,3 +15,4 @@ shuttle-runtime = "0.45.0"
 tera = "1.20.0"
 tokio = "1.28.2"
 axum-extra = { version = "0.9.3", features = ["cookie-private", "cookie", "typed-header"] }
+futures = "0.3.30"

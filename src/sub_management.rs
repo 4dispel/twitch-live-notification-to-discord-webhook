@@ -1,6 +1,6 @@
 use reqwest::Client;
 use serde::{Serialize, Deserialize, };
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct UserCard {
     pfp_link: String,
     user_login: String,
@@ -44,20 +44,23 @@ enum UserIdentifier {
     LOGIN(String),
 }
 
-
+use futures::future::join_all;
 
 pub async fn get_cards(
     client: &Client,
     twitch_client_id: &String,
     twitch_access_token: &String,
 ) -> Vec<UserCard> {
-    let mut cards: Vec<UserCard> = Vec::new();
-    for sub in get_subs(client, twitch_client_id, twitch_access_token).await.iter() {
-        if let Some(card) = card_from_sub(sub.clone(), client, twitch_client_id, twitch_access_token).await {
-            cards.push(card);
-        }
-    }
-    cards
+    let fetches: Vec<_> = get_subs(client, twitch_client_id, twitch_access_token).await
+        .iter()
+        .map(|sub| card_from_sub(sub.clone(), client, twitch_client_id, twitch_access_token))
+        .collect();
+    join_all(fetches)
+        .await
+        .iter()
+        .flatten()
+        .map(|x| x.clone())
+        .collect()
 }
 
 pub async fn remove_sub(
