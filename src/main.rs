@@ -178,16 +178,24 @@ async fn get_twitch_access_token(
         .access_token))
 }
 
+fn correct_password(jar: &PrivateCookieJar, password: &String) -> bool {
+    if let Some(cookie) = jar.get("password") {
+        if cookie.value_trimmed() != password.as_str() {
+            false
+        } else {
+            true
+        }
+    } else {
+        false
+    }
+}
+
 async fn index(
     State(app): State<AppState>,
     Extension(templates): Extension<Template>,
     jar: PrivateCookieJar,
 ) -> impl IntoResponse {
-    if let Some(cookie) = jar.get("password") {
-        if cookie.value_trimmed() != app.password.as_str() {
-            return Redirect::to("/login").into_response();
-        }
-    } else {
+    if !correct_password(&jar, &app.password) {
         return Redirect::to("/login").into_response();
     }
     let mut ctx = Context::new();
@@ -205,11 +213,7 @@ async fn reverify(
     State(mut app): State<AppState>,
     jar: PrivateCookieJar,
 ) -> impl IntoResponse {
-    if let Some(cookie) = jar.get("password") {
-        if cookie.value_trimmed() != app.password.as_str() {
-            return Redirect::to("/login").into_response();
-        }
-    } else {
+    if !correct_password(&jar, &app.password) {
         return Redirect::to("/login").into_response();
     }
     app.twitch_access_token = get_twitch_access_token(&app.twitch_client_id, &app.twitch_client_secret, &app.request_client).await.unwrap();
@@ -244,11 +248,7 @@ async fn post_remove(
     State(app): State<AppState>,
     multipart: Multipart,
 ) -> impl IntoResponse {
-    if let Some(cookie) = jar.get("password") {
-        if cookie.value_trimmed() != app.password.as_str() {
-            return Redirect::to("/login").into_response();
-        }
-    } else {
+    if !correct_password(&jar, &app.password) {
         return Redirect::to("/login").into_response();
     }
     if let Some(id) = from_multipart(multipart, "eventsub_id").await {
@@ -267,11 +267,7 @@ async fn post_add(
     State(app): State<AppState>,
     multipart: Multipart,
 ) -> impl IntoResponse {
-    if let Some(cookie) = jar.get("password") {
-        if cookie.value_trimmed() != app.password.as_str() {
-            return Redirect::to("/login").into_response();
-        }
-    } else {
+    if !correct_password(&jar, &app.password) {
         return Redirect::to("/login").into_response();
     }
     if let Some(login) = from_multipart(multipart, "login").await {
